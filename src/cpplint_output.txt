@@ -1,1 +1,0 @@
-Skipping input 'src/publisher_member_function.cpp': Can't open for reading
