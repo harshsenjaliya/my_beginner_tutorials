@@ -140,5 +140,4 @@ int main(int argc, char* argv[]) {
   rclcpp::shutdown();
 
   RCLCPP_WARN_STREAM(node->get_logger(), "Shutting Down!!");
-  return 0;
-}
+  return 0;}

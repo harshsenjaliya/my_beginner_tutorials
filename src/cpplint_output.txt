@@ -1,1 +1,4 @@
-Skipping input 'src/publisher_member_function.cpp': Can't open for reading
+Done processing publisher_member_function.cpp
+Done processing server_client.cpp
+Done processing subscriber_member_function.cpp
+Total errors found: 2

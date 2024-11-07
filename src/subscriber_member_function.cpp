@@ -72,5 +72,4 @@ int main(int argc, char* argv[]) {
 
   // Log a warning message indicating that the node is shutting down.
   RCLCPP_WARN_STREAM(node->get_logger(), "Shutting Down!! " << 4);
-  return 0;
-}
+  return 0;}
