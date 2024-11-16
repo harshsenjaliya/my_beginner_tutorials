@@ -1,0 +1,8 @@
+harsh_senjaliya@harsh:~/my_beginner_tutorials/src/my_beginner_tutorials$ cpplint --filter=-legal/copyright,-build/c++11,+build/c++17,-build/namespaces,-build/include_order $(find . -name *.cpp | grep -v "/build/")
+Done processing ./src/integration_test_node.cpp
+Done processing ./src/modify_string_client.cpp
+Done processing ./src/publisher_member_function.cpp
+Done processing ./src/subscriber_member_function.cpp
+
+harsh_senjaliya@harsh:~/my_beginner_tutorials$ clang-tidy -p build/beginner_tutorials --extra-arg=-std=c++17 src/my_beginner_tutorials/src/*.cpp
+harsh_senjaliya@harsh:~/my_beginner_tutorials$

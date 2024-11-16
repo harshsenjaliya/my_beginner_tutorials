@@ -1,15 +1,17 @@
 /**
- * Apache 2.0 License
- * CopyRight 2024 Harsh Senjaliya
  * @file subscriber_member_function.cpp
- * @brief Subscriber class that creates a subscriber for the service node
- * @version 1.0
- * @date 2024-11-06
- * @author Harsh Senjaliya
+ * @author Harsh Senjaliya (hsenjali@umd.edu)
+ * @brief A simple cpp ROS2 subscriber
+ * @version 2.0
+ * @date 2024-11-08
+ *
+ * @copyright Copyright (c) 2024
+ *
  */
-
+#include <chrono>
 #include <functional>
 #include <memory>
+#include <rclcpp/timer.hpp>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -17,59 +19,57 @@
 using std::placeholders::_1;
 
 /**
- * @class MinimalSubscriber
- * @brief A simple ROS2 subscriber node that listens to a topic and logs the received messages.
+ * @brief Class MinimalSubscriber to define a node that publishes a string to a
+ * topic
+ *
  */
-class MinimalSubscriber : public rclcpp::Node{
+class MinimalSubscriber : public rclcpp::Node {
  public:
-   /**
-   * @brief Constructor for MinimalSubscriber.
-   * Initializes the node and sets up the subscription.
+  /**
+   * @brief Construct a new Minimal Subscriber object
+   * @param node_name Name of the subscriber node
    */
-  MinimalSubscriber(): Node("minimal_subscriber") {
-    try {
-    // Create a subscription to the "topic" topic with a queue size of 10.
-    // The TopicCallback method will be called
-    // whenever a new message is received.
+  MinimalSubscriber() : Node("minimal_subscriber") {
+    // create subscription handle
     subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "topic", 10, std::bind(&MinimalSubscriber::TopicCallback, this, _1));
-    RCLCPP_DEBUG_STREAM(this->get_logger(), "Subscriber has been started.");
-  } catch (...) {
-    // Log an error and a fatal message
-    // if an exception occurs during initialization.
-    RCLCPP_ERROR_STREAM(this->get_logger(),
-      "Error occurred in the constructor.");
-    RCLCPP_FATAL_STREAM(this->get_logger(),
-      "Fatal error occurred in the constructor.");
-    }
+        "/topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+    message_received_ = false;
+    // create wall timer to check regularly for messages
+    timer_ = this->create_wall_timer(
+        std::chrono::seconds(1),
+        std::bind(&MinimalSubscriber::check_for_messages, this));
   }
 
  private:
-   /**
-   * @brief Callback function that is called whenever a new message is received on the subscribed topic.
-   * @param msg The received message.
+  /**
+   * @brief Topic callback to handle messages
+   *
+   * @param msg Message received from topic
    */
-  void TopicCallback(const std_msgs::msg::String &msg) const {
-    // Log the received message.
-    RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg.data.c_str());
+  void topic_callback(const std_msgs::msg::String& msg) {
+    RCLCPP_INFO_STREAM(this->get_logger(), "I heard: " << msg.data.c_str());
+    message_received_ = true;
   }
-  // A shared pointer to the subscription object.
+
+  /**
+   * @brief Function to check if the publisher has published yet
+   *
+   */
+  void check_for_messages() {
+    if (!message_received_) {
+      RCLCPP_ERROR_STREAM(this->get_logger(),
+                          "Topic 'topic' not published yet..");
+    }
+  }
+
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  bool message_received_;
 };
 
 int main(int argc, char* argv[]) {
-  // Initialize the ROS2 system.
   rclcpp::init(argc, argv);
-
-  // Create a shared pointer to the MinimalSubscriber node.
-  auto node = std::make_shared<MinimalSubscriber>();
-
-  // Spin the node to start the subscriber.
-  rclcpp::spin(node);
-
-  // Shutdown the ROS2 system.
+  rclcpp::spin(std::make_shared<MinimalSubscriber>());
   rclcpp::shutdown();
-
-  // Log a warning message indicating that the node is shutting down.
-  RCLCPP_WARN_STREAM(node->get_logger(), "Shutting Down!! " << 4);
-  return 0;}
+  return 0;
+}

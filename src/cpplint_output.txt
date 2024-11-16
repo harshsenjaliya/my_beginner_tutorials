@@ -1,4 +1,0 @@
-Done processing publisher_member_function.cpp
-Done processing server_client.cpp
-Done processing subscriber_member_function.cpp
-Total errors found: 2
